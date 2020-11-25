@@ -1,0 +1,31 @@
+---
+title: "Python in R"
+author: "Shannon Ellis"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# install.packages("reticulate")
+library(reticulate)
+```
+
+## Including python code
+
+It's possible to include Python code in an R Markdown document
+```{python}
+a = [1, 2, 3]
+len(a)
+
+def my_function(input_val):
+    output = []
+    
+    for val in input_val:
+        output.append(val + 1)
+    
+    return output
+
+my_function(a)
+```

@@ -1,0 +1,181 @@
+---
+title: "R Basics"
+author: "Shannon Ellis"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# install.packages("tidyverse")
+library(tidyverse)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+It is the R equivalent of a Jupyter Notebook. (I'm biased, but I think they're way spiffier than Jupyter Notebooks. And, don't get me wrong. I think Jupyter Notebooks are a great tool!)
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+Note that R has a handful of datasets built in. `cars` is one of them. `pressure` (used below) is another one of them
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot. How you want the code chunk (~code cell) to behave is specified within the {}. There are two general approaches to plotting in R: `base R`. That's what was used above and `ggplot2` (that's what I'll introduce below). 
+
+## R Basics
+
+### Assignment 
+
+There are two assignment operators: `<-`/`->` and `=`. R users prefer `<-`, as it allows for directionality.
+
+```{r}
+# three eqiuivalent lines
+my_val <- 0
+my_val2 = 0
+0 -> my_val3
+
+print(c(my_val, my_val2, my_val3))
+```
+
+### Loops & Conditionals
+
+All the base functionality in Python exists in R (like loops, conditionals, functions, etc.); however, the syntax is different. Python *definitely* wins when it comes to cleanness of syntax here. Lots of {} curly braces involved in for loops and condtionals in R.
+
+```{r loops-conditionals}
+val <- c(1, 2, 3, 4)
+out <- c()
+
+for(x in val){
+    if(x < 3){ 
+        out <- c(out, x)
+    }
+}
+        
+out
+```
+
+### Functions 
+
+Function definition happens according to the following general syntax:
+
+```{r functions}
+function_name <- function(input_val){
+    output = c()
+    
+    for(val in input_val){
+        output = c(output, val + 1)
+    }
+    
+    output
+}
+
+function_name(input_val = c(1, 2, 3))
+
+```
+
+
+Note that an explicit return statement is not needed. Whatever the last variable is is returned from the function.
+
+### Working with data
+
+There is something called the tidyverse. Think of it as a suite of packages that make working with tabular data really easy in R and use a consistent API across (meaning all the packages "play nicely" together. A few of these packages are:
+
+- `readr`: for reading in various tabular data types (CSV, txt, etc.)
+- `dplyr`: for manipulating data frames (think: removing rows, renaming rows, filtering, etc.; `pandas`' counterpart)
+- `ggplot2`: for making visualizations
+
+#### `readr`
+
+The general syntax for reading in a CSV file is `df <- read_csv('path/to/file/file.csv')`. Functions from the `readr` package will start with the prefix `read_`.
+
+#### `dplyr`
+
+`dplyr` has a *ton* of functionality. We'll use the `diamonds` dataset to demonstrate some of this functionality:
+
+```{r diamonds}
+diamonds
+```
+
+**`filter`**
+
+Within the tidyverse, the general approach to analysis and data manipulation uses piping. The pipe `%>%` can be read as "and then". So the code below says take the `diamonds` dataset *and then* filter it based on the specified conditions.
+
+```{r filter}
+diamonds %>% 
+    filter(color == 'E', depth < 60)
+```
+
+**`select`**
+
+We can also specify which columns we're interested in. We can build onto the previous statement by adding an additional pipe.
+
+```{r select}
+diamonds %>% 
+    filter(color == 'E', depth < 60) %>% 
+    select(carat, cut, color, depth)
+```
+
+**`arrange`**
+
+It's also quite easy to sort, using `arrange`. If we wanted to sort our rows by carat, we could do the following (again, building on what we've already done above):
+
+```{r arrange}
+diamonds %>% 
+    filter(color == 'E', depth < 60) %>% 
+    select(carat, cut, color, depth) %>%
+    arrange(carat)
+```
+
+There's a ton more within the `dplyr` package to explore! But, for brevity, I'll stop there.
+
+#### `ggplot2`
+
+`ggplot2` applies the grammar of graphics to plots in R. Once you understand that grammar, you can easily build any type of plot.
+
+The general syntax is:
+
+```
+ggplot(df, aes(x=val, y=val)) +
+    geom_*()
+```
+
+This allows you to specify what data to use, what specific columns to use, and what geometry to apply.
+
+To see an example, let's generate a boxplot of carat by cut:
+
+```{r boxplot}
+ggplot(diamonds, aes(x = cut, y = carat)) + 
+    geom_boxplot()
+```
+
+Because `ggplot2` is built on this idea of layering, we can use the above and then add layers to this plot to customize it:
+
+
+```{r custom-boxplot}
+ggplot(diamonds, aes(x = cut, y = carat)) + 
+    geom_boxplot() +
+    labs(title = "Diamonds of a 'Fair' cut tend to be of a higher carat",
+         x = "Diamond Cut",
+         y = "Carat") + 
+    theme_classic()
+```
+
+In the above plot I changed the axis labels, added a title, and applid a theme to remove the background. 
+
+Note that the `tidyverse` is a tool. It is great for working with tabular data. But, it is not great when working with other object types (i.e. the `DESeq` objects)
+
+
+
